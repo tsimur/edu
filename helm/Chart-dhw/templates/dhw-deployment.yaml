@@ -1,22 +1,22 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: dhw-deployment
-  namespace: dhw-space
+  name: {{ .Release.name }}-deployment
+  namespace: {{ .Values.namespace }}
   labels:
-    app: dhw
+    app: {{ .Release.name }}
 spec:
-  replicas: 2
+  replicas: {{ .Values.replicas }}
   selector:
     matchLabels:
-      app: dhw
+      app: {{ .Release.name }}
   template:
     metadata:
       labels:
-        app: dhw
+        app: {{ .Release.name }}
     spec:
       containers:
-      - name: dhw
+      - name: {{ .Release.name }}
         image: crccheck/hello-world
         ports:
         - containerPort: 8000

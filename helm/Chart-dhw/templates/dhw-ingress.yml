@@ -1,17 +1,17 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: dhw-ingress
-  namespace: dhw-space
+  name: {{ .Release.name }}-ingress
+  namespace: {{ .Values.namespace }}
 spec:
   rules:
-    - host: dhw.inf123
+    - host: {{ .Values.specRulesHost }}
       http:
         paths:
           - path: /
             pathType: Prefix
             backend:
               service:
-                name: dhw-service
+                name: {{ .Release.name }}-service
                 port:
                   number: 8000
