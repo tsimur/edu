@@ -1,0 +1,22 @@
+$script = <<-SCRIPT
+  apt update
+  apt -y install make gcc libc6-dev tcl
+  wget http://download.redis.io/redis-stable.tar.gz
+  tar xvzf redis-stable.tar.gz
+  cd redis-stable
+  sudo make install
+SCRIPT
+Vagrant.configure("2") do |config|
+  config.vm.box = "ubuntu/focal64"
+  config.vm.provision "shell", inline: $script
+
+  config.vm.define "redis1" do |redis1|
+    redis1.vm.network "public_network", ip: "192.168.111.121", bridge: "wlo1"
+  end
+
+  config.vm.define "redis2" do |redis2|
+    redis2.vm.network "public_network", ip: "192.168.111.122", bridge: "wlo1"
+  end
+
+end
+
