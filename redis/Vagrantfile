@@ -5,17 +5,34 @@ $script = <<-SCRIPT
   tar xvzf redis-stable.tar.gz
   cd redis-stable
   sudo make install
+  sudo chown vagrant:vagrant /home/vagrant/redis-stable
+  sudo chmod 775 /home/vagrant/redis-stable
+  echo "redis-server ~/redis-stable/xxx.conf"
+  echo "redis-cli --cluster create 192.168.111.121:6379 192.168.111.122:6380 192.168.111.122:6381 --cluster-yes"
 SCRIPT
+
+$redis1 = <<-SCRIPT
+  cp /vagrant/configs/redis1-node/*.conf /home/vagrant/redis-stable/
+SCRIPT
+
+$redis2 = <<-SCRIPT
+  cp /vagrant/configs/redis2-node/*.conf /home/vagrant/redis-stable/
+SCRIPT
+
 Vagrant.configure("2") do |config|
   config.vm.box = "ubuntu/focal64"
   config.vm.provision "shell", inline: $script
 
   config.vm.define "redis1" do |redis1|
+    redis1.vm.hostname = "redis1"
     redis1.vm.network "public_network", ip: "192.168.111.121", bridge: "wlo1"
+    redis1.vm.provision "shell", inline: $redis1
   end
 
   config.vm.define "redis2" do |redis2|
+    redis2.vm.hostname = "redis2"
     redis2.vm.network "public_network", ip: "192.168.111.122", bridge: "wlo1"
+    redis2.vm.provision "shell", inline: $redis2
   end
 
 end
