@@ -1,0 +1,66 @@
+$script = <<-SCRIPT
+  sudo apt-get -y update
+  sudo apt-get -y install postgresql postgresql-contrib
+
+  curl https://dl.2ndquadrant.com/default/release/get/deb | sudo bash
+  sudo apt-get -y update
+  sudo apt-get -y install postgresql-12-repmgr
+SCRIPT
+
+
+$ps1 = <<-SCRIPT
+  echo '10.20.30.41 ps1-server' | sudo tee -a /etc/hosts
+  echo '10.20.30.42 ps2-server' | sudo tee -a /etc/hosts
+  sudo cp /vagrant/postgresql.conf /etc/postgresql/12/main/postgresql.conf
+  sudo cp /vagrant/pg_hba.conf /etc/postgresql/12/main/pg_hba.conf
+  sudo cp /vagrant/1repmgr.conf /etc/repmgr.conf
+  # sudo -i -u postgres
+  # createuser --replication --createdb --createrole --superuser repmgr
+  # createdb repmgr -O repmgr
+  # psql -c 'ALTER USER repmgr SET search_path TO repmgr_test, "$user", public;'
+  # sudo service postgresql restart
+  # sudo service repmgrd restart
+  # repmgr -f /etc/repmgr.conf primary register
+  # repmgr cluster show
+  # psql 'host=ps1-server dbname=repmgr user=repmgr'
+  # SELECT * FROM repmgr.nodes;
+SCRIPT
+
+
+$ps2 = <<-SCRIPT
+  echo '10.20.30.41 ps1-server' | sudo tee -a /etc/hosts
+  echo '10.20.30.42 ps2-server' | sudo tee -a /etc/hosts
+  sudo cp /vagrant/postgresql.conf /etc/postgresql/12/main/postgresql.conf
+  sudo cp /vagrant/2repmgr.conf /etc/repmgr.conf
+  sudo cp /vagrant/pg_hba.conf /etc/postgresql/12/main/pg_hba.conf
+  # sudo -i -u postgres
+  # createuser -s repmgr
+  # createdb repmgr -O repmgr
+  # sudo mkdir /var/lib/postgresql/data
+  # sudo chown postgres:postgres /var/lib/postgresql/data
+  # sudo chmod 700 /var/lib/postgresql/data
+  # sudo service postgresql restart
+  # sudo -i -u postgres 
+  # repmgr -h ps1-server -U repmgr -d repmgr -f /etc/repmgr.conf standby clone --dry-run
+SCRIPT
+
+
+Vagrant.configure("2") do |config|
+  config.vm.box = "ubuntu/focal64"
+  config.vm.provision "shell", inline: $script
+
+  config.vm.define "ps1" do |ps1|
+    ps1.vm.hostname = "ps1"
+    ps1.vm.network "private_network", ip: "10.20.30.41",
+    virtualbox__intnet: true
+    ps1.vm.provision "shell", inline: $ps1
+  end
+
+  config.vm.define "ps2" do |ps2|
+    ps2.vm.hostname = "ps2"
+    ps2.vm.network "private_network", ip: "10.20.30.42",
+    virtualbox__intnet: true
+    ps2.vm.provision "shell", inline: $ps2
+  end
+
+end
