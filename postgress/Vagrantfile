@@ -18,8 +18,10 @@ $ps1 = <<-SCRIPT
   # createuser --replication --createdb --createrole --superuser repmgr
   # createdb repmgr -O repmgr
   # psql -c 'ALTER USER repmgr SET search_path TO repmgr_test, "$user", public;'
+  # exit
   # sudo service postgresql restart
   # sudo service repmgrd restart
+  # sudo -i -u postgres
   # repmgr -f /etc/repmgr.conf primary register
   # repmgr cluster show
   # psql 'host=ps1-server dbname=repmgr user=repmgr'
