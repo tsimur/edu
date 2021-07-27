@@ -1,47 +1,60 @@
 $script = <<-SCRIPT
+  echo '10.20.30.41 ps1-server' | sudo tee -a /etc/hosts
+  echo '10.20.30.42 ps2-server' | sudo tee -a /etc/hosts
+  
   sudo apt-get -y update
-  sudo apt-get -y install postgresql postgresql-contrib
+  apt-get -y install apt-transport-https
+  echo "deb https://dl.2ndquadrant.com/default/release/apt stretch-$2ndquadrant main" > /etc/apt/sources.list.d/2ndquadrant.list
+  wget --quiet -O - https://dl.2ndquadrant.com/gpg-key.asc | apt-key add -
+  apt-get -y install postgresql postgresql-12-repmgr
+  systemctl stop postgresql
+  echo "postgres ALL = NOPASSWD: /usr/bin/pg_ctlcluster" > /etc/sudoers.d/postgres
+  cp /vagrant/repmgrd /etc/default/
+  chown postgres:postgres /etc/default/repmgrd
 
-  curl https://dl.2ndquadrant.com/default/release/get/deb | sudo bash
-  sudo apt-get -y update
-  sudo apt-get -y install postgresql-12-repmgr
+  # sudo service postgresql restart 
+  # sudo service repmgrd restart 
+  # ps aux | grep repmgrd
+  # sudo -i -u postgres
+  # createuser --replication --createdb --createrole --superuser repmgr
+  # createdb repmgr -O repmgr
+  # repmgr primary register
+  # repmgr cluster show
 SCRIPT
 
 
 $ps1 = <<-SCRIPT
-  echo '10.20.30.41 ps1-server' | sudo tee -a /etc/hosts
-  echo '10.20.30.42 ps2-server' | sudo tee -a /etc/hosts
-  sudo cp /vagrant/postgresql.conf /etc/postgresql/12/main/postgresql.conf
-  sudo cp /vagrant/pg_hba.conf /etc/postgresql/12/main/pg_hba.conf
-  sudo cp /vagrant/1repmgr.conf /etc/repmgr.conf
-  # sudo -i -u postgres
-  # createuser --replication --createdb --createrole --superuser repmgr
-  # createdb repmgr -O repmgr
-  # psql -c 'ALTER USER repmgr SET search_path TO repmgr_test, "$user", public;'
-  # sudo service postgresql restart
-  # sudo service repmgrd restart
-  # repmgr -f /etc/repmgr.conf primary register
-  # repmgr cluster show
-  # psql 'host=ps1-server dbname=repmgr user=repmgr'
-  # SELECT * FROM repmgr.nodes;
+  echo ps1
+  cp -r /vagrant/ps1/.ssh/ /var/lib/postgresql/
+  chown -R postgres:postgres /var/lib/postgresql/.ssh
+
+  cp /vagrant/1repmgr.conf /etc/repmgr.conf
+  chown postgres:postgres /etc/repmgr.conf
+
+  cp /vagrant/postgresql.conf /etc/postgresql/12/main/postgresql.conf
+  chown postgres:postgres /etc/postgresql/12/main/postgresql.conf
+  cp /vagrant/pg_hba.conf /etc/postgresql/12/main/pg_hba.conf
+  chown postgres:postgres /etc/postgresql/12/main/pg_hba.conf
 SCRIPT
 
 
 $ps2 = <<-SCRIPT
-  echo '10.20.30.41 ps1-server' | sudo tee -a /etc/hosts
-  echo '10.20.30.42 ps2-server' | sudo tee -a /etc/hosts
-  sudo cp /vagrant/postgresql.conf /etc/postgresql/12/main/postgresql.conf
-  sudo cp /vagrant/2repmgr.conf /etc/repmgr.conf
-  sudo cp /vagrant/pg_hba.conf /etc/postgresql/12/main/pg_hba.conf
+  echo ps2
+  cp -r /vagrant/ps2/.ssh/ /var/lib/postgresql/
+  chown -R postgres:postgres /var/lib/postgresql/.ssh
+
+  cp /vagrant/2repmgr.conf /etc/repmgr.conf
+  chown postgres:postgres /etc/repmgr.conf
+
+  # sudo service postgresql restart 
+  # sudo service repmgrd restart
+  # sudo systemctl stop postgresql
   # sudo -i -u postgres
-  # createuser -s repmgr
-  # createdb repmgr -O repmgr
-  # sudo mkdir /var/lib/postgresql/data
-  # sudo chown postgres:postgres /var/lib/postgresql/data
-  # sudo chmod 700 /var/lib/postgresql/data
-  # sudo service postgresql restart
-  # sudo -i -u postgres 
-  # repmgr -h ps1-server -U repmgr -d repmgr -f /etc/repmgr.conf standby clone --dry-run
+  # rm -r /var/lib/postgresql/12/main/*
+  # repmgr -h ps1-server -U repmgr -d repmgr standby clone --dry-run
+  # exit
+  # sudo systemctl start postgresql
+  # repmgr cluster show
 SCRIPT
 
 
