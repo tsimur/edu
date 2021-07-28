@@ -17,7 +17,7 @@ SCRIPT
 
 $ps1 = <<-SCRIPT
   echo ps1
-  cp -r /vagrant/ps1/.ssh/ /var/lib/postgresql/
+  cp -r /vagrant/ps1/ssh/ /var/lib/postgresql/
   chown -R postgres:postgres /var/lib/postgresql/.ssh
 
   cp /vagrant/1repmgr.conf /etc/repmgr.conf
@@ -42,7 +42,7 @@ SCRIPT
 
 $ps2 = <<-SCRIPT
   echo ps2
-  cp -r /vagrant/ps2/.ssh/ /var/lib/postgresql/
+  cp -r /vagrant/ps2/ssh/ /var/lib/postgresql/
   chown -R postgres:postgres /var/lib/postgresql/.ssh
 
   cp /vagrant/postgresql.conf /etc/postgresql/12/main/postgresql.conf
