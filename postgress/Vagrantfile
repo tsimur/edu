@@ -12,14 +12,6 @@ $script = <<-SCRIPT
   cp /vagrant/repmgrd /etc/default/
   chown postgres:postgres /etc/default/repmgrd
 
-  # sudo service postgresql restart 
-  # sudo service repmgrd restart 
-  # ps aux | grep repmgrd
-  # sudo -i -u postgres
-  # createuser --replication --createdb --createrole --superuser repmgr
-  # createdb repmgr -O repmgr
-  # repmgr primary register
-  # repmgr cluster show
 SCRIPT
 
 
@@ -33,8 +25,18 @@ $ps1 = <<-SCRIPT
 
   cp /vagrant/postgresql.conf /etc/postgresql/12/main/postgresql.conf
   chown postgres:postgres /etc/postgresql/12/main/postgresql.conf
+
   cp /vagrant/pg_hba.conf /etc/postgresql/12/main/pg_hba.conf
   chown postgres:postgres /etc/postgresql/12/main/pg_hba.conf
+
+  # sudo service postgresql restart 
+  # sudo service repmgrd restart 
+  # ps aux | grep repmgrd
+  # sudo -i -u postgres
+  # createuser --replication --createdb --createrole --superuser repmgr
+  # createdb repmgr -O repmgr
+  # repmgr primary register
+  # repmgr cluster show
 SCRIPT
 
 
@@ -43,18 +45,30 @@ $ps2 = <<-SCRIPT
   cp -r /vagrant/ps2/.ssh/ /var/lib/postgresql/
   chown -R postgres:postgres /var/lib/postgresql/.ssh
 
+  cp /vagrant/postgresql.conf /etc/postgresql/12/main/postgresql.conf
+  chown postgres:postgres /etc/postgresql/12/main/postgresql.conf
+
   cp /vagrant/2repmgr.conf /etc/repmgr.conf
   chown postgres:postgres /etc/repmgr.conf
 
+  cp /vagrant/pg_hba.conf /etc/postgresql/12/main/pg_hba.conf
+  chown postgres:postgres /etc/postgresql/12/main/pg_hba.conf
+
   # sudo service postgresql restart 
   # sudo service repmgrd restart
+  # sudo -i -u postgres
+  # createuser --replication --createdb --createrole --superuser repmgr
+  # createdb repmgr -O repmgr
+  # exit
   # sudo systemctl stop postgresql
   # sudo -i -u postgres
   # rm -r /var/lib/postgresql/12/main/*
   # repmgr -h ps1-server -U repmgr -d repmgr standby clone --dry-run
+  # repmgr -h ps1-server -U repmgr -d repmgr standby clone
   # exit
   # sudo systemctl start postgresql
   # repmgr cluster show
+  # psql 'host=ps1-server dbname=repmgr user=repmgr'
 SCRIPT
 
 
